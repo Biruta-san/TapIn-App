@@ -1,19 +1,15 @@
 import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {tabRoutes} from './tabRoutes';
-import {
-  SceneMap,
-  TabBar,
-  TabView,
-} from 'react-native-tab-view';
+import {SceneMap, TabBar, TabView} from 'react-native-tab-view';
 import {StyleSheet} from 'react-native';
-import { retrieveColorString } from '../../shared/utils/enums/styleEnums';
+import {retrieveColorString} from '../../shared/utils/enums/styleEnums';
 
 // Define the shape of each tab route
 interface TabRoute {
   key: string;
   title: string;
-  icon: Element;
+  icon: React.ComponentType<{color: string | undefined}>;
   component: React.ComponentType;
 }
 
@@ -32,6 +28,7 @@ const styles = StyleSheet.create({
   },
   tab: {
     backgroundColor: 'white',
+    color: 'black',
   },
 });
 
@@ -58,6 +55,16 @@ const MainScreen: React.FC = () => {
     ),
   );
 
+  const renderIcon = ({
+    route,
+    focused,
+  }: {
+    route: TabRoute;
+    focused: boolean;
+  }) => {
+    return <route.icon color={focused ? retrieveColorString() : '#AAA'} />;
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <TabView
@@ -65,10 +72,15 @@ const MainScreen: React.FC = () => {
         renderScene={renderScene}
         onIndexChange={setIndex}
         tabBarPosition={'bottom'}
+        commonOptions={{
+          icon: ({route, focused}) => renderIcon({route, focused}),
+        }}
         renderTabBar={props => (
           <TabBar
             {...props}
             indicatorStyle={{backgroundColor: retrieveColorString()}}
+            activeColor={retrieveColorString()}
+            inactiveColor="#AAA"
             style={styles.tab}
           />
         )}

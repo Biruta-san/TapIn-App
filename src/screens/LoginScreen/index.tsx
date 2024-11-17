@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {Dimensions, StyleSheet} from 'react-native';
 import Layout from '../../shared/components/Layouts/Layout';
 import Text from '../../shared/components/Typography/Text';
@@ -7,10 +6,10 @@ import BaseButton from '../../shared/components/Form/Buttons/BaseButton';
 import Input from '../../shared/components/Form/Inputs/Input';
 import {postDataApi, updateApiHeaders} from '../../shared/utils/api/functions';
 import LocationIcon from '../../shared/components/Icons/LocationIcon';
-import { USUARIO_LOGIN_ROUTE } from '../../shared/apiroutes';
-import { retrieveColorString } from '../../shared/utils/enums/styleEnums';
+import {USUARIO_LOGIN_ROUTE} from '../../shared/apiroutes';
+import {retrieveColorString} from '../../shared/utils/enums/styleEnums';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-// Define the types for the props
 interface LoginScreenProps {
   navigation: {
     navigate: (screen: string) => void;
@@ -43,7 +42,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
         navigation.navigate('Main');
       }
     } catch (error) {
-      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -51,7 +49,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Layout style={styles.safeArea}>
+      <Layout flex={1} bg={retrieveColorString()}>
         <Layout flex={4}>
           <LocationIcon size={120} color="white" />
           <Text category={'h1'} color={'white'}>
@@ -63,13 +61,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
           borderTopLeftRadius={30}
           borderTopRightRadius={30}
           bg={'white'}
-          alignItems={'center'}>
-          <Layout mt={height * 0.05} bg="inherit">
-            <Text category={'h2'} useThemeColor>
-              Login
-            </Text>
-          </Layout>
-          <Layout bg={'inherit'} gap={height * 0.05} mt={height * 0.05}>
+          justifyContent="flex-start"
+          gap={height * 0.05}>
+          <Text mt={height * 0.05} category={'h2'} useThemeColor>
+            Login
+          </Text>
+          <Layout
+            justifyContent="flex-start"
+            bg={'inherit'}
+            gap={height * 0.05}>
             <Input
               label="Email"
               placeholder={'Informe o email'}
@@ -83,10 +83,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
               onChange={setPassword}
               isPassword
             />
+            <BaseButton loading={loading} onPress={handleLogin}>
+              <Text fontWeight="bold" color={'white'}>
+                Entrar
+              </Text>
+            </BaseButton>
           </Layout>
-          <BaseButton loading={loading} onPress={handleLogin}>
-            <Text color={'white'}>Entrar</Text>
-          </BaseButton>
         </Layout>
       </Layout>
     </SafeAreaView>

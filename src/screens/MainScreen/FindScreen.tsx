@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import Layout from '../../shared/components/Layouts/Layout';
 import {
+  Image,
   Modal,
-  ScrollView,
+  FlatList,
   StyleSheet,
   TouchableOpacity,
   View,
+  Dimensions,
 } from 'react-native';
 import SearchButton from '../../shared/components/Form/Buttons/SearchButton';
 import Input from '../../shared/components/Form/Inputs/Input';
@@ -15,23 +17,18 @@ import {generateHotelsList, Hotel} from '../../shared/utils/mocks/hotel';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Text from '../../shared/components/Typography/Text';
 import Card from '../../shared/components/Cards/Card';
-import ImageSlider from '../../shared/components/Media/ImageSlider';
 import {TouchableWithoutFeedback} from '@ui-kitten/components/devsupport';
 import CustomAccordion from '../../shared/components/Accordion/CustomAccordion';
 import SearchIcon from '../../shared/components/Icons/SearchIcon';
 import CloseIcon from '../../shared/components/Icons/CloseIcon';
 import {retrieveColorString} from '../../shared/utils/enums/styleEnums';
 
+const {width} = Dimensions.get('window');
 const HotelCard = ({item}: {item: Hotel}) => {
   type RootStackParamList = {
     Reservar: {hotelId: number; item: Hotel};
   };
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
-  const fotos = [
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/40/e5/50/20190118-193234-largejpg.jpg',
-    'https://www.civitatis.com/blog/wp-content/uploads/2022/11/downtown-orlando-florida.jpg',
-  ];
 
   return (
     <TouchableWithoutFeedback
@@ -39,7 +36,12 @@ const HotelCard = ({item}: {item: Hotel}) => {
         navigation.navigate('Reservar', {hotelId: item.id, item});
       }}>
       <Card>
-        <ImageSlider images={fotos} />
+        <Image
+          style={styles.hotelImage}
+          source={{
+            uri: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/40/e5/50/20190118-193234-largejpg.jpg',
+          }}
+        />
         <View style={styles.hotelInfo}>
           <Text style={styles.hotelName}>{item.nome}</Text>
           <Text style={styles.hotelLocation}>
@@ -61,10 +63,7 @@ const FindScreen = () => {
   const [listHoteis, setListHoteis] = useState<Hotel[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      handleSearchHoteis();
-    };
-    fetchData();
+    handleSearchHoteis();
   }, []);
 
   const handleSearchHoteis = async () => {
@@ -122,17 +121,20 @@ const FindScreen = () => {
             activeOpacity={1}
             onPress={() => setModalVisible(true)}>
             <View style={styles.container}>
-              <SearchIcon />
+              <SearchIcon color={retrieveColorString()} />
               <Text>Pesquisar</Text>
             </View>
           </TouchableOpacity>
         </View>
         <View style={styles.listView}>
-          <ScrollView contentContainerStyle={styles.scrollViewContent}>
-            {listHoteis.map((hotel, index) => (
-              <HotelCard key={index} item={hotel} />
-            ))}
-          </ScrollView>
+          {/* Converted to FlatList */}
+          <FlatList
+            data={listHoteis}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => <HotelCard item={item} />}
+            contentContainerStyle={styles.flatListContent}
+            showsVerticalScrollIndicator={false}
+          />
         </View>
       </Layout>
       <Modal
@@ -143,13 +145,13 @@ const FindScreen = () => {
         <View style={styles.modalContent}>
           <View style={styles.closeIconContainer}>
             <TouchableOpacity onPress={handleCloseModal}>
-              <CloseIcon />
+              <CloseIcon color={retrieveColorString()} />
             </TouchableOpacity>
           </View>
           <View style={styles.accordionContainer}>
             <CustomAccordion sections={SECTIONS} />
+            <SearchButton onClick={() => {}} />
           </View>
-          <SearchButton onClick={() => {}} />
         </View>
       </Modal>
     </Layout>
@@ -172,12 +174,10 @@ const styles = StyleSheet.create({
   },
   listView: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     width: '100%',
     paddingTop: 10,
   },
-  scrollViewContent: {
+  flatListContent: {
     paddingHorizontal: 20,
     alignItems: 'center',
   },
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 10,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
   },
   container: {
     flex: 1,
@@ -220,21 +220,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  searchButton: {
-    marginBottom: 20,
-    padding: 15,
-    backgroundColor: '#007BFF',
-    borderRadius: 5,
-    alignItems: 'center',
-    width: '90%',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-  },
   hotelImage: {
     borderRadius: 8,
     resizeMode: 'cover',
+    width: width - 60,
+    height: (width - 40) * 0.6,
+    padding: 10,
   },
   hotelInfo: {
     flex: 1,

@@ -4,6 +4,7 @@ import {
   StyleType,
   Weight,
 } from '../../utils/enums/styleEnums';
+import React from 'react';
 
 interface TextProps {
   children: string;
@@ -15,6 +16,10 @@ interface TextProps {
   style?: object;
   fontSize?: number;
   fontWeight?: 'bold' | 'normal';
+  mt?: number;
+  mb?: number;
+  mr?: number;
+  ml?: number;
 }
 
 const Text = ({
@@ -27,6 +32,10 @@ const Text = ({
   style,
   fontSize,
   fontWeight,
+  mt,
+  mb,
+  mr,
+  ml,
 }: TextProps) => {
   const getSize = () => {
     switch (category) {
@@ -68,6 +77,10 @@ const Text = ({
         : color ?? '#202020',
       fontSize: fontSize ?? getSize(),
       fontWeight: fontWeight ?? getWeight(),
+      marginTop: mt ?? 0,
+      marginBottom: mb ?? 0,
+      marginRight: mr ?? 0,
+      marginLeft: ml ?? 0,
     },
   });
 

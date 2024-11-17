@@ -13,7 +13,7 @@ const Card: React.FC<CardProps> = ({children}) => {
 const styles = StyleSheet.create({
   hotelCard: {
     flexDirection: 'column',
-    width: '98%',
+    width: '100%',
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 10,
