@@ -1,3 +1,4 @@
+import CheckinScreen from './src/screens/CheckinScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import MainScreen from './src/screens/MainScreen';
 import ReservarScreen from './src/screens/ReservarScreen';
@@ -22,6 +23,11 @@ const routes: route[] = [
   {
     name: 'Reservar',
     component: ReservarScreen,
+    options: {headerShown: false},
+  },
+  {
+    name: 'Checkin',
+    component: CheckinScreen,
     options: {headerShown: false},
   },
 ];

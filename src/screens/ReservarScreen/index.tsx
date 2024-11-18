@@ -7,6 +7,7 @@ import RangeDatepicker from '../../shared/components/Form/Inputs/RangeDatePicker
 import NumericInput from '../../shared/components/Form/Inputs/NumericInput';
 import BaseButton from '../../shared/components/Form/Buttons/BaseButton';
 import {RouteProp} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 // Define types for the component props
 type ReservarScreenProps = {
@@ -76,8 +77,8 @@ const ReservarScreen: React.FC<ReservarScreenProps> = ({route}) => {
   }, [hotelId]);
 
   return (
-    <>
-      <ImageSlider images={fotos} imageBorderRadius={0} />
+    <SafeAreaView style={styles.container}>
+      <ImageSlider images={fotos} />
       <View style={styles.detailsContainer}>
         <Text category={'h1'} style={styles.hotelName}>
           {item?.nome}
@@ -90,7 +91,7 @@ const ReservarScreen: React.FC<ReservarScreenProps> = ({route}) => {
         </Text>
         <CustomAccordion sections={SECTIONS} />
       </View>
-    </>
+    </SafeAreaView>
   );
 };
 
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    marginTop: -20,
+    marginTop: -50,
   },
   hotelName: {
     fontSize: 24,
@@ -115,5 +116,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#202020',
     marginBottom: 10,
+  },
+  container: {
+    backgroundColor: '#F2F2F2',
+    flex: 1,
   },
 });

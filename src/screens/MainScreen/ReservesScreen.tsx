@@ -62,7 +62,7 @@ const ReservesScreen: React.FC<ReservesScreenProps> = () => {
   return (
     <Layout flex={1} bg={'white'}>
       <Layout flex={1} bg={'white'} paddingTop={10}>
-        <Text category={'h3'} useThemeColor>
+        <Text mt={10} category={'h3'} useThemeColor>
           Reservas
         </Text>
         <View style={styles.listView}>

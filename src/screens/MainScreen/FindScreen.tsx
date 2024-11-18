@@ -127,7 +127,6 @@ const FindScreen = () => {
           </TouchableOpacity>
         </View>
         <View style={styles.listView}>
-          {/* Converted to FlatList */}
           <FlatList
             data={listHoteis}
             keyExtractor={item => item.id.toString()}
