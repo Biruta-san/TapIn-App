@@ -14,6 +14,10 @@ interface NumericInputProps {
   marginTop?: number;
   w?: DimensionValue;
   width?: DimensionValue;
+  mb?: number;
+  mt?: number;
+  ml?: number;
+  mr?: number;
 }
 
 const NumericInput: React.FC<NumericInputProps> = ({
@@ -26,12 +30,19 @@ const NumericInput: React.FC<NumericInputProps> = ({
   marginTop,
   w,
   width,
+  mb,
+  mt,
+  ml,
+  mr,
 }) => {
   const styles = StyleSheet.create({
     container: {
       width: w ?? width ?? '80%',
       borderRadius: 10,
-      marginTop: marginTop ?? 0,
+      marginTop: mt ?? marginTop ?? 0,
+      marginBottom: mb ?? 0,
+      marginLeft: ml ?? 0,
+      marginRight: mr ?? 0,
     },
   });
 

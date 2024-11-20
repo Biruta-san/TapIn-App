@@ -19,16 +19,21 @@ export const weightEnums = {
   400: '400',
   500: '500',
   600: '600',
+  700: '700',
   800: '800',
   900: '900',
 } as const;
 
-export type StyleType = keyof typeof styleTypeEnums;
-export type Weight = keyof typeof weightEnums | typeof weightEnums[keyof typeof weightEnums];
+export type StyleType =
+  | keyof typeof styleTypeEnums
+  | (typeof styleTypeEnums)[keyof typeof styleTypeEnums];
+export type Weight =
+  | keyof typeof weightEnums
+  | (typeof weightEnums)[keyof typeof weightEnums];
 
 export const retrieveColorString = (
   styleType: StyleType = 'PRIMARY',
-  weight: Weight = weightEnums[500]
+  weight: Weight = weightEnums[500],
 ): string | undefined => {
   let weightString: string;
 
@@ -46,6 +51,7 @@ export const retrieveColorString = (
       weightString = typeof weight === 'string' ? weight : weightEnums[weight];
   }
 
-  const colorString = `color-${styleType.toLowerCase()}-${weightString}` as keyof typeof theme;
+  const colorString =
+    `color-${styleType.toLowerCase()}-${weightString}` as keyof typeof theme;
   return theme[colorString];
 };

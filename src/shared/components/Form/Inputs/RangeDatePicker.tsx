@@ -6,6 +6,7 @@ import {
   NativeDateService,
 } from '@ui-kitten/components';
 import Caption from './Caption';
+import {StyleSheet} from 'react-native';
 
 // Define the props interface for the RangeDatepicker component
 interface RangeDatepickerProps {
@@ -14,6 +15,10 @@ interface RangeDatepickerProps {
   label?: string; // Optional label for the datepicker
   placeholder?: string; // Optional placeholder for the datepicker
   helperText?: string; // Optional helper text
+  mb?: number; // Optional margin bottom
+  mt?: number; // Optional margin top
+  ml?: number; // Optional margin left
+  mr?: number; // Optional margin right
 }
 
 const RangeDatepicker: React.FC<RangeDatepickerProps> = ({
@@ -22,7 +27,20 @@ const RangeDatepicker: React.FC<RangeDatepickerProps> = ({
   label,
   placeholder,
   helperText,
+  mb,
+  mt,
+  ml,
+  mr,
 }) => {
+  const styles = StyleSheet.create({
+    field: {
+      marginBottom: mb || 0,
+      marginTop: mt || 0,
+      marginLeft: ml || 0,
+      marginRight: mr || 0,
+    },
+  });
+
   const i18n: I18nConfig = {
     dayNames: {
       short: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
@@ -75,6 +93,7 @@ const RangeDatepicker: React.FC<RangeDatepickerProps> = ({
 
   return (
     <KRangeDatePicker
+      style={styles.field}
       range={range}
       onSelect={onSelect}
       dateService={localeDateService}

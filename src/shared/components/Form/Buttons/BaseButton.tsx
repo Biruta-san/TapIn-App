@@ -14,6 +14,10 @@ interface BaseButtonProps extends ButtonProps {
   w?: DimensionValue;
   // accessoryLeft?: ReactNode;
   // accessoryRight?: ReactNode;
+  mb?: number;
+  mt?: number;
+  ml?: number;
+  mr?: number;
 }
 
 const BaseButton: React.FC<BaseButtonProps> = ({
@@ -26,15 +30,22 @@ const BaseButton: React.FC<BaseButtonProps> = ({
   w,
   accessoryLeft,
   accessoryRight,
+  mt,
+  mb,
+  ml,
+  mr,
   ...props
 }) => {
   const defaultStyle = StyleSheet.create({
     button: {
       borderRadius: 10,
-      marginTop: 20,
+      marginTop: mt ?? 20,
       backgroundColor: retrieveColorString(),
       borderColor: 'transparent',
       width: width ?? w ?? '80%',
+      marginBottom: mb ?? 0,
+      marginLeft: ml ?? 0,
+      marginRight: mr ?? 0,
     },
     buttonContent: {
       flex: 1,

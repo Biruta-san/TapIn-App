@@ -1,6 +1,6 @@
 import {Spinner} from '@ui-kitten/components';
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Platform, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import NfcManager, {NfcEvents, NfcTech} from 'react-native-nfc-manager';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BaseButton from '../../shared/components/Form/Buttons/BaseButton';
@@ -9,6 +9,7 @@ import Text from '../../shared/components/Typography/Text';
 const CheckinScreen: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [hasNfc, setHasNFC] = useState<boolean | null>(null);
+  const [tagInfo, setTagInfo] = useState<any>(null);
 
   useEffect(() => {
     const checkIsSupported = async () => {
@@ -32,21 +33,34 @@ const CheckinScreen: React.FC = () => {
   const readNdef = async () => {
     try {
       setIsSearching(true);
-      await NfcManager.requestTechnology([NfcTech.Ndef]);
+      console.log('iniciando');
+      await NfcManager.requestTechnology(NfcTech.NfcV);
       const tag = await NfcManager.getTag();
+      setTagInfo(tag);
 
-      if (tag) {
-        const status = await NfcManager.ndefHandler.getNdefStatus();
+      console.log(tag, tagInfo);
 
-        if (Platform.OS === 'ios') {
-          await NfcManager.setAlertMessageIOS('NDEF tag encontrada');
-        }
-        console.warn('Tag encontrada', tag, status);
-      }
+      // if (tag) {
+      //   const status = await NfcManager.nfcVHandler.transceive();
+
+      //   if (Platform.OS === 'ios') {
+      //     await NfcManager.setAlertMessageIOS('NDEF tag encontrada');
+      //   }
+      //   console.warn('Tag encontrada', tag, status);
+      // }
+    } catch (ex) {
+      console.warn('Oops!', JSON.stringify(ex));
+    } finally {
+      stopReadNdef();
+    }
+  };
+
+  const stopReadNdef = async () => {
+    try {
+      await NfcManager.cancelTechnologyRequest();
     } catch (ex) {
       console.warn('Oops!', ex);
     } finally {
-      NfcManager.cancelTechnologyRequest();
       setIsSearching(false);
     }
   };
@@ -62,6 +76,11 @@ const CheckinScreen: React.FC = () => {
           {isSearching ? (
             <View style={styles.loadingContainer}>
               <Spinner size="giant" />
+              <BaseButton onPress={stopReadNdef}>
+                <Text fontWeight="bold" color={'white'}>
+                  Parar pesquisa
+                </Text>
+              </BaseButton>
             </View>
           ) : (
             <BaseButton onPress={readNdef}>

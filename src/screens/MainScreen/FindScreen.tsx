@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import Layout from '../../shared/components/Layouts/Layout';
 import {
-  Image,
   Modal,
   FlatList,
   StyleSheet,
@@ -21,7 +20,12 @@ import {TouchableWithoutFeedback} from '@ui-kitten/components/devsupport';
 import CustomAccordion from '../../shared/components/Accordion/CustomAccordion';
 import SearchIcon from '../../shared/components/Icons/SearchIcon';
 import CloseIcon from '../../shared/components/Icons/CloseIcon';
-import {retrieveColorString} from '../../shared/utils/enums/styleEnums';
+import {
+  retrieveColorString,
+  styleTypeEnums,
+  weightEnums,
+} from '../../shared/utils/enums/styleEnums';
+import ImageSlider from '../../shared/components/Media/ImageSlider/ImageSlider';
 
 const {width} = Dimensions.get('window');
 const HotelCard = ({item}: {item: Hotel}) => {
@@ -29,6 +33,10 @@ const HotelCard = ({item}: {item: Hotel}) => {
     Reservar: {hotelId: number; item: Hotel};
   };
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const fotos: string[] = [
+    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/40/e5/50/20190118-193234-largejpg.jpg',
+    'https://www.civitatis.com/blog/wp-content/uploads/2022/11/downtown-orlando-florida.jpg',
+  ];
 
   return (
     <TouchableWithoutFeedback
@@ -36,19 +44,38 @@ const HotelCard = ({item}: {item: Hotel}) => {
         navigation.navigate('Reservar', {hotelId: item.id, item});
       }}>
       <Card>
-        <Image
-          style={styles.hotelImage}
-          source={{
-            uri: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/40/e5/50/20190118-193234-largejpg.jpg',
-          }}
-        />
+        <View style={styles.imageView}>
+          <ImageSlider
+            images={fotos}
+            imageHeight={250}
+            dotSize={10}
+            dotColor={retrieveColorString(
+              styleTypeEnums.PRIMARY,
+              weightEnums[700],
+            )}
+            activeDotColor={retrieveColorString(
+              styleTypeEnums.PRIMARY,
+              weightEnums[700],
+            )}
+            showNavigationButtons={false}
+            showIndicatorDots={true}
+            imageLabel={false}
+            extrapolate="clamp"
+            autoSlideInterval={10000}
+            radius={5}
+          />
+        </View>
         <View style={styles.hotelInfo}>
-          <Text style={styles.hotelName}>{item.nome}</Text>
-          <Text style={styles.hotelLocation}>
-            {`${item.cidade} ${item.endereco} ${item.numero}`}
+          <Text fontWeight="bold" fontSize={16}>
+            {item.nome}
+          </Text>
+          <Text fontSize={14}>
+            {`${item.cidade} - ${item.endereco} - N° ${item.numero}`}
           </Text>
           <Text
-            style={styles.hotelPrice}>{`Diária: R$ ${item.valorDiaria}`}</Text>
+            useThemeColor
+            fontSize={16}
+            fontWeight="bold">{`Diária: R$ ${item.valorDiaria}`}</Text>
         </View>
       </Card>
     </TouchableWithoutFeedback>
@@ -113,7 +140,7 @@ const FindScreen = () => {
   ];
 
   return (
-    <Layout flex={1}>
+    <Layout flex={1} bg={'white'}>
       <Layout flex={1} bg={'white'} paddingTop={10}>
         <View style={styles.shadowView}>
           <TouchableOpacity
@@ -242,6 +269,13 @@ const styles = StyleSheet.create({
     color: retrieveColorString(),
     fontWeight: 'bold',
     fontSize: 14,
+  },
+  imageView: {
+    width: '100%',
+    alignSelf: 'center',
+    marginRight: 20,
+    marginLeft: 5,
+    marginBottom: 10,
   },
 });
 

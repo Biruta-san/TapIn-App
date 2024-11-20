@@ -1,20 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import Text from '../../shared/components/Typography/Text';
-import ImageSlider from '../../shared/components/Media/ImageSlider';
 import CustomAccordion from '../../shared/components/Accordion/CustomAccordion';
 import RangeDatepicker from '../../shared/components/Form/Inputs/RangeDatePicker';
 import NumericInput from '../../shared/components/Form/Inputs/NumericInput';
 import BaseButton from '../../shared/components/Form/Buttons/BaseButton';
 import {RouteProp} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import ImageSlider from '../../shared/components/Media/ImageSlider/ImageSlider';
+import {
+  retrieveColorString,
+  styleTypeEnums,
+  weightEnums,
+} from '../../shared/utils/enums/styleEnums';
 
-// Define types for the component props
 type ReservarScreenProps = {
   route: RouteProp<{params: {hotelId: number; item: HotelItem}}, 'params'>;
 };
 
-// Define the type for the hotel item
 interface HotelItem {
   id: number;
   nome: string;
@@ -47,6 +50,7 @@ const ReservarScreen: React.FC<ReservarScreenProps> = ({route}) => {
             onSelect={nextRange => setQuando(nextRange)}
             label={'Período da viagem'}
             placeholder={'Selecione o período'}
+            mb={5}
           />
           <NumericInput
             value={quantasPessoas}
@@ -54,8 +58,9 @@ const ReservarScreen: React.FC<ReservarScreenProps> = ({route}) => {
             w={'100%'}
             placeholder={'Quantidade de pessoas'}
             label={'Informe a quantidade de pessoas'}
+            mb={5}
           />
-          <BaseButton w={'100%'} onPress={() => {}}>
+          <BaseButton mb={5} w={'100%'} onPress={() => {}}>
             <Text fontWeight="bold" color="white">
               Agendar
             </Text>
@@ -78,7 +83,23 @@ const ReservarScreen: React.FC<ReservarScreenProps> = ({route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ImageSlider images={fotos} />
+      <ImageSlider
+        images={fotos}
+        imageHeight={250}
+        dotSize={10}
+        dotColor={retrieveColorString(styleTypeEnums.PRIMARY, weightEnums[700])}
+        activeDotColor={retrieveColorString(
+          styleTypeEnums.PRIMARY,
+          weightEnums[700],
+        )}
+        showNavigationButtons={false}
+        showIndicatorDots={true}
+        imageLabel={false}
+        extrapolate="clamp"
+        autoSlideInterval={10000}
+        containerStyle={styles.container}
+        radius={5}
+      />
       <View style={styles.detailsContainer}>
         <Text category={'h1'} style={styles.hotelName}>
           {item?.nome}
@@ -118,7 +139,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   container: {
-    backgroundColor: '#F2F2F2',
+    backgroundColor: retrieveColorString(
+      styleTypeEnums.PRIMARY,
+      weightEnums[200],
+    ),
     flex: 1,
   },
 });
