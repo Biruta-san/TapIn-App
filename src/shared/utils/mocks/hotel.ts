@@ -1,35 +1,6 @@
 import {faker} from '@faker-js/faker';
-
-// Define types for the data structure
-export interface HotelImage {
-  id: number;
-  hotelId: number;
-  nomeArquivo: string;
-  guidArquivo: string;
-  base64: string;
-}
-
-export interface Hotel {
-  id: number;
-  nome: string;
-  valorDiaria: string;
-  cidade: string;
-  endereco: string;
-  numero: number;
-  imagens: HotelImage[];
-}
-
-export interface UsuarioAgendamento {
-  id: number;
-  checkIn: string;
-  checkOut: string;
-  hotelId: number;
-  hotelNome: string;
-  hotelEndereco: string;
-  hotelQuartoId: number;
-  hotelQuartoNumero: number;
-  usuarioId: number;
-}
+import {Hotel} from '../../interfaces/hotel';
+import {UsuarioAgendamento} from '../../interfaces/usuario';
 
 // Function to generate a single hotel with mock data
 export const generateHotelMock = (): Hotel => ({

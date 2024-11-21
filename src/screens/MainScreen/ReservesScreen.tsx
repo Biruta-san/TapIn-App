@@ -1,10 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {View, FlatList, StyleSheet, ListRenderItem} from 'react-native';
 import Text from '../../shared/components/Typography/Text';
-import {
-  generateUserReservesList,
-  UsuarioAgendamento,
-} from '../../shared/utils/mocks/hotel';
+import {generateUserReservesList} from '../../shared/utils/mocks/hotel';
 import Layout from '../../shared/components/Layouts/Layout';
 import Card from '../../shared/components/Cards/Card';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
@@ -16,6 +13,7 @@ import {
   weightEnums,
 } from '../../shared/utils/enums/styleEnums';
 import ImageSlider from '../../shared/components/Media/ImageSlider/ImageSlider';
+import {UsuarioAgendamento} from '../../shared/interfaces/usuario';
 
 type RootStackParamList = {
   Checkin: undefined;

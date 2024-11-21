@@ -12,7 +12,7 @@ import SearchButton from '../../shared/components/Form/Buttons/SearchButton';
 import Input from '../../shared/components/Form/Inputs/Input';
 import RangeDatepicker from '../../shared/components/Form/Inputs/RangeDatePicker';
 import NumericInput from '../../shared/components/Form/Inputs/NumericInput';
-import {generateHotelsList, Hotel} from '../../shared/utils/mocks/hotel';
+import {generateHotelsList} from '../../shared/utils/mocks/hotel';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Text from '../../shared/components/Typography/Text';
 import Card from '../../shared/components/Cards/Card';
@@ -26,6 +26,7 @@ import {
   weightEnums,
 } from '../../shared/utils/enums/styleEnums';
 import ImageSlider from '../../shared/components/Media/ImageSlider/ImageSlider';
+import {Hotel} from '../../shared/interfaces/hotel';
 
 const {width} = Dimensions.get('window');
 const HotelCard = ({item}: {item: Hotel}) => {

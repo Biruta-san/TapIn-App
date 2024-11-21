@@ -9,4 +9,5 @@ export const USUARIO_LIST_ROUTE: string = `${USUARIO_ROUTE}/lista`;
 // #region HOTEL
 export const HOTEL_ROUTE: string = `${API_BASE_ROUTE}/hotel`;
 export const HOTEL_LIST_ROUTE: string = `${HOTEL_ROUTE}/lista`;
+export const HOTEL_QUARTO_LIST_ROUTE: string = `${HOTEL_ROUTE}/quartos`;
 // #endregion

@@ -74,14 +74,16 @@ const CheckinScreen: React.FC = () => {
       ) : hasNfc ? (
         <>
           {isSearching ? (
-            <View style={styles.loadingContainer}>
-              <Spinner size="giant" />
+            <>
+              <View style={styles.loadingContainer}>
+                <Spinner size="giant" />
+              </View>
               <BaseButton onPress={stopReadNdef}>
                 <Text fontWeight="bold" color={'white'}>
                   Parar pesquisa
                 </Text>
               </BaseButton>
-            </View>
+            </>
           ) : (
             <BaseButton onPress={readNdef}>
               <Text fontWeight="bold" color={'white'}>
