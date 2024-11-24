@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Dimensions, StyleSheet} from 'react-native';
 import Layout from '../../shared/components/Layouts/Layout';
 import Text from '../../shared/components/Typography/Text';
@@ -9,6 +9,7 @@ import LocationIcon from '../../shared/components/Icons/LocationIcon';
 import {USUARIO_LOGIN_ROUTE} from '../../shared/apiroutes';
 import {retrieveColorString} from '../../shared/utils/enums/styleEnums';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {User, UserContext} from '../../shared/context/UserProvider';
 
 interface LoginScreenProps {
   navigation: {
@@ -18,10 +19,13 @@ interface LoginScreenProps {
 
 interface LoginResponse {
   token: string;
+  usuario: User;
 }
 
+const {height} = Dimensions.get('window');
+
 const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
-  const {height} = Dimensions.get('window');
+  const userContext = useContext(UserContext);
 
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
@@ -39,6 +43,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
       });
       if (result.data.token) {
         updateApiHeaders(result.data.token);
+        userContext?.setUser(result.data.usuario);
         navigation.navigate('Main');
       }
     } catch (error) {

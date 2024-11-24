@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Layout from '../../shared/components/Layouts/Layout';
 import {
   Modal,
@@ -12,7 +12,6 @@ import SearchButton from '../../shared/components/Form/Buttons/SearchButton';
 import Input from '../../shared/components/Form/Inputs/Input';
 import RangeDatepicker from '../../shared/components/Form/Inputs/RangeDatePicker';
 import NumericInput from '../../shared/components/Form/Inputs/NumericInput';
-import {generateHotelsList} from '../../shared/utils/mocks/hotel';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Text from '../../shared/components/Typography/Text';
 import Card from '../../shared/components/Cards/Card';
@@ -27,44 +26,46 @@ import {
 } from '../../shared/utils/enums/styleEnums';
 import ImageSlider from '../../shared/components/Media/ImageSlider/ImageSlider';
 import {Hotel} from '../../shared/interfaces/hotel';
+import {getDataApi} from '../../shared/utils/api/functions';
+import {HOTEL_LIST_ROUTE} from '../../shared/apiroutes';
+import {getIntNumber} from '../../shared/utils/numberUtils';
+import {CalendarRange, Spinner} from '@ui-kitten/components';
 
 const {width} = Dimensions.get('window');
 const HotelCard = ({item}: {item: Hotel}) => {
   type RootStackParamList = {
-    Reservar: {hotelId: number; item: Hotel};
+    Reservar: {hotelId: number};
   };
+
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const fotos: string[] = [
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/40/e5/50/20190118-193234-largejpg.jpg',
-    'https://www.civitatis.com/blog/wp-content/uploads/2022/11/downtown-orlando-florida.jpg',
-  ];
 
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        navigation.navigate('Reservar', {hotelId: item.id, item});
+        navigation.navigate('Reservar', {hotelId: item.id});
       }}>
       <Card>
         <View style={styles.imageView}>
-          <ImageSlider
-            images={fotos}
-            imageHeight={250}
-            dotSize={10}
-            dotColor={retrieveColorString(
-              styleTypeEnums.PRIMARY,
-              weightEnums[700],
-            )}
-            activeDotColor={retrieveColorString(
-              styleTypeEnums.PRIMARY,
-              weightEnums[700],
-            )}
-            showNavigationButtons={false}
-            showIndicatorDots={true}
-            imageLabel={false}
-            extrapolate="clamp"
-            autoSlideInterval={10000}
-            radius={5}
-          />
+          {item.imagens.length > 0 && (
+            <ImageSlider
+              images={item.imagens}
+              imageHeight={250}
+              dotSize={10}
+              dotColor={retrieveColorString(
+                styleTypeEnums.PRIMARY,
+                weightEnums[700],
+              )}
+              activeDotColor={retrieveColorString(
+                styleTypeEnums.PRIMARY,
+                weightEnums[700],
+              )}
+              showNavigationButtons={false}
+              showIndicatorDots={true}
+              imageLabel={false}
+              extrapolate="clamp"
+              autoSlideInterval={10000}
+            />
+          )}
         </View>
         <View style={styles.hotelInfo}>
           <Text fontWeight="bold" fontSize={16}>
@@ -86,17 +87,35 @@ const HotelCard = ({item}: {item: Hotel}) => {
 const FindScreen = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [onde, setOnde] = useState<string>();
-  const [quando, setQuando] = useState<Record<string, any>>({});
+  const [quando, setQuando] = useState<CalendarRange<Date>>({});
   const [quantasPessoas, setQuantasPessoas] = useState<string>();
   const [listHoteis, setListHoteis] = useState<Hotel[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleSearchHoteis = useCallback(async (params?: SearchParams) => {
+    try {
+      setLoading(true);
+      const result = await getDataApi<Hotel[]>(HOTEL_LIST_ROUTE, params || {});
+      if (result.status >= 200 && result.status < 300) {
+        setListHoteis(result.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     handleSearchHoteis();
-  }, []);
+  }, [handleSearchHoteis]);
 
-  const handleSearchHoteis = async () => {
-    setListHoteis(generateHotelsList(10));
-  };
+  interface SearchParams {
+    pesquisa?: string;
+    checkIn?: Date;
+    checkOut?: Date;
+    numeroPessoas?: number;
+  }
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -155,13 +174,19 @@ const FindScreen = () => {
           </TouchableOpacity>
         </View>
         <View style={styles.listView}>
-          <FlatList
-            data={listHoteis}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({item}) => <HotelCard item={item} />}
-            contentContainerStyle={styles.flatListContent}
-            showsVerticalScrollIndicator={false}
-          />
+          {!loading ? (
+            <FlatList
+              data={listHoteis}
+              keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => <HotelCard item={item} />}
+              contentContainerStyle={styles.flatListContent}
+              showsVerticalScrollIndicator={false}
+            />
+          ) : (
+            <Layout bg="white">
+              <Spinner />
+            </Layout>
+          )}
         </View>
       </Layout>
       <Modal
@@ -177,7 +202,18 @@ const FindScreen = () => {
           </View>
           <View style={styles.accordionContainer}>
             <CustomAccordion sections={SECTIONS} />
-            <SearchButton onClick={() => {}} />
+            <SearchButton
+              onClick={() =>
+                handleSearchHoteis({
+                  pesquisa: onde,
+                  numeroPessoas: quantasPessoas
+                    ? getIntNumber(quantasPessoas)
+                    : undefined,
+                  checkIn: quando.startDate,
+                  checkOut: quando.endDate,
+                })
+              }
+            />
           </View>
         </View>
       </Modal>

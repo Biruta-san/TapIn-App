@@ -13,7 +13,7 @@ export interface Hotel {
   cidade: string;
   endereco: string;
   numero: number;
-  imagens: HotelImage[];
+  imagens: (string | null)[];
 }
 
 export interface ListHotelQuarto {
@@ -21,4 +21,15 @@ export interface ListHotelQuarto {
   numero: number;
   valorDiaria: number;
   capacidadePessoa: number;
+}
+
+export interface HotelQuartoAgendamento {
+  id: number;
+  checkIn: Date;
+  checkOut: Date;
+  hotelQuartoId: number;
+  usuarioId: number;
+  usuarioNome: string;
+  confirmado: boolean;
+  tagId: string | null;
 }

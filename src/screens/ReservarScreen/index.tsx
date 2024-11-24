@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import Text from '../../shared/components/Typography/Text';
 import CustomAccordion from '../../shared/components/Accordion/CustomAccordion';
@@ -13,31 +13,81 @@ import {
   styleTypeEnums,
   weightEnums,
 } from '../../shared/utils/enums/styleEnums';
+import Selection, {Option} from '../../shared/components/Form/Inputs/Selection';
+import {getDataByIdApi, postDataApi} from '../../shared/utils/api/functions';
+import {
+  Hotel,
+  HotelQuartoAgendamento,
+  ListHotelQuarto,
+} from '../../shared/interfaces/hotel';
+import {
+  HOTEL_AGENDAR_ROUTE,
+  HOTEL_QUARTO_LIST_ROUTE,
+  HOTEL_ROUTE,
+} from '../../shared/apiroutes';
+import {userContext} from '../../shared/context/UserProvider';
 
 type ReservarScreenProps = {
-  route: RouteProp<{params: {hotelId: number; item: HotelItem}}, 'params'>;
+  route: RouteProp<{params: {hotelId: number}}, 'params'>;
+  navigation: {
+    navigate: (screen: string) => void;
+  };
 };
 
-interface HotelItem {
-  id: number;
-  nome: string;
-  cidade: string;
-  endereco: string;
-  valorDiaria: number;
-}
-
-const ReservarScreen: React.FC<ReservarScreenProps> = ({route}) => {
+const ReservarScreen: React.FC<ReservarScreenProps> = ({route, navigation}) => {
   const hotelId = route?.params?.hotelId;
-  const item = route?.params?.item;
-  // const [dadosHotel, setDadosHotel] = useState<HotelItem | null>(null);
+  const [dadosHotel, setDadosHotel] = useState<Hotel | null>(null);
   const [quando, setQuando] = useState<{startDate?: Date; endDate?: Date}>({});
   const [quantasPessoas, setQuantasPessoas] = useState<string>();
+  const [quarto, setQuarto] = useState<number>();
+  const [quartoOptions, setQuartoOptions] = useState<Option[]>([]);
 
-  // Mocked image URLs
   const fotos: string[] = [
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/40/e5/50/20190118-193234-largejpg.jpg',
     'https://www.civitatis.com/blog/wp-content/uploads/2022/11/downtown-orlando-florida.jpg',
   ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (hotelId) {
+        const result = await getDataByIdApi<Hotel>(HOTEL_ROUTE, hotelId);
+        setDadosHotel(result.data);
+        const apiOptions = await getDataByIdApi<ListHotelQuarto[]>(
+          HOTEL_QUARTO_LIST_ROUTE,
+          hotelId,
+        );
+        if (apiOptions.status >= 200 && apiOptions.status < 300) {
+          const options: Option[] = apiOptions.data.map(q => ({
+            value: q.id,
+            title: q.numero.toString(),
+          }));
+          setQuartoOptions(options);
+        }
+      }
+    };
+    fetchData();
+  }, [hotelId]);
+
+  const saveReservation = async () => {
+    try {
+      const response = await postDataApi<HotelQuartoAgendamento>(
+        HOTEL_AGENDAR_ROUTE,
+        {
+          hotelQuartoId: quarto,
+          usuarioId: user?.user?.id,
+          dataCheckin: quando.startDate,
+          dataCheckout: quando.endDate,
+        },
+      );
+      if (response.status >= 200 && response.status < 300) {
+        navigation.navigate('Main');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const user = useContext(userContext);
 
   // Accordion sections
   const SECTIONS = [
@@ -60,7 +110,16 @@ const ReservarScreen: React.FC<ReservarScreenProps> = ({route}) => {
             label={'Informe a quantidade de pessoas'}
             mb={5}
           />
-          <BaseButton mb={5} w={'100%'} onPress={() => {}}>
+          <Selection
+            label={'Selecione o quarto'}
+            placeholder={'Selecione o quarto'}
+            w={'100%'}
+            options={quartoOptions}
+            setValue={value =>
+              setQuarto(Array.isArray(value) ? value[0] : value)
+            }
+          />
+          <BaseButton mb={5} w={'100%'} onPress={saveReservation}>
             <Text fontWeight="bold" color="white">
               Agendar
             </Text>
@@ -69,17 +128,6 @@ const ReservarScreen: React.FC<ReservarScreenProps> = ({route}) => {
       ),
     },
   ];
-
-  // Fetch hotel data
-  useEffect(() => {
-    const fetchData = async () => {
-      if (hotelId) {
-        // const result = await getDataByIdApi<HotelItem>(HOTEL_ROUTE, hotelId);
-        // setDadosHotel(result.data);
-      }
-    };
-    fetchData();
-  }, [hotelId]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,13 +150,13 @@ const ReservarScreen: React.FC<ReservarScreenProps> = ({route}) => {
       />
       <View style={styles.detailsContainer}>
         <Text category={'h1'} style={styles.hotelName}>
-          {item?.nome}
+          {`${dadosHotel?.nome}`}
         </Text>
         <Text style={styles.hotelLocation}>
-          {`${item?.cidade} ${item?.endereco}`}
+          {`${dadosHotel?.cidade} ${dadosHotel?.endereco}`}
         </Text>
         <Text category={'h6'} useThemeColor fontWeight={'bold'}>
-          {`Diária: R$ ${item?.valorDiaria}`}
+          {`Diária: R$ ${dadosHotel?.valorDiaria}`}
         </Text>
         <CustomAccordion sections={SECTIONS} />
       </View>

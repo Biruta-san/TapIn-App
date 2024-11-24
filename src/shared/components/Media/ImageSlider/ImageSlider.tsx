@@ -13,7 +13,7 @@ import globalStyles from './assets/globalStyles';
 import MaterialIcons from 'react-native-vector-icons/AntDesign';
 
 interface ImageSliderProps {
-  images: string[];
+  images: (string | null)[];
   imageHeight?: number;
   imageWidth?: number;
   dotSize?: number;
@@ -52,10 +52,11 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const {width: windowWidth} = useWindowDimensions();
   const styles = globalStyles(StyleSheet);
+  const filterImages = images.filter(image => image !== null);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      if (currentIndex < images.length - 1) {
+      if (currentIndex < filterImages.length - 1) {
         scrollViewRef.current?.scrollTo({
           x: windowWidth * (currentIndex + 1),
           animated: true,
@@ -71,7 +72,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     }, autoSlideInterval);
 
     return () => clearInterval(timer);
-  }, [autoSlideInterval, currentIndex, images.length, windowWidth]);
+  }, [autoSlideInterval, currentIndex, filterImages.length, windowWidth]);
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -84,7 +85,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   };
 
   const handleNext = () => {
-    if (currentIndex < images.length - 1) {
+    if (currentIndex < filterImages.length - 1) {
       scrollViewRef.current?.scrollTo({
         x: windowWidth * (currentIndex + 1),
         animated: true,
@@ -121,7 +122,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
           )}
           onMomentumScrollEnd={handleScrollEnd}
           scrollEventThrottle={1}>
-          {images.map((image, imageIndex) => (
+          {filterImages.map((image, imageIndex) => (
             <View
               key={imageIndex}
               style={{width: imageWidth ?? windowWidth, height: imageHeight}}>
@@ -166,7 +167,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
 
         {showIndicatorDots && (
           <View style={[styles.indicatorContainer, containerStyle]}>
-            {images.map((_, imageIndex) => {
+            {filterImages.map((_, imageIndex) => {
               const width = scrollX.interpolate({
                 inputRange: [
                   windowWidth * (imageIndex - 1),

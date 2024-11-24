@@ -1,14 +1,11 @@
 import React, {useState} from 'react';
 import {Input as KInput} from '@ui-kitten/components';
 import Caption from './Caption';
-import {
-  DimensionValue,
-  StyleSheet,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import {DimensionValue, StyleSheet} from 'react-native';
 import {retrieveColorString} from '../../../utils/enums/styleEnums';
 import VisibleIcon from '../../Icons/VisibleIcon';
 import NoVisibleIcon from '../../Icons/NoVisibleIcon';
+import {TouchableWithoutFeedback} from '@ui-kitten/components/devsupport';
 
 // Define the props interface for the Input component
 interface InputProps {

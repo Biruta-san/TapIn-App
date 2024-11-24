@@ -6,29 +6,32 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import routes, {initialRouteName} from './routes';
 import {LogBox} from 'react-native';
 import React from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {UserProvider} from './src/shared/context/UserProvider';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   LogBox.ignoreAllLogs(true);
   return (
-    <SafeAreaProvider>
-      <ApplicationProvider {...eva} theme={{...eva.light, ...theme}}>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName={initialRouteName}>
-            {routes.map((route, index) => (
-              <Stack.Screen
-                key={index}
-                name={route.name}
-                component={route.component}
-                options={route.options}
-              />
-            ))}
-          </Stack.Navigator>
-        </NavigationContainer>
-      </ApplicationProvider>
-    </SafeAreaProvider>
+    <UserProvider>
+      <SafeAreaProvider>
+        <ApplicationProvider {...eva} theme={{...eva.light, ...theme}}>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName={initialRouteName}>
+              {routes.map((route, index) => (
+                <Stack.Screen
+                  key={index}
+                  name={route.name}
+                  component={route.component}
+                  options={route.options}
+                />
+              ))}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </ApplicationProvider>
+      </SafeAreaProvider>
+    </UserProvider>
   );
 };
 

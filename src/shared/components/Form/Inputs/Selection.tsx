@@ -3,7 +3,7 @@ import {DimensionValue, StyleSheet} from 'react-native';
 import {IndexPath, Layout, Select, SelectItem} from '@ui-kitten/components';
 import Caption from './Caption';
 
-interface Option {
+export interface Option {
   value: number;
   title: string;
 }
@@ -44,11 +44,13 @@ const Selection = ({
         label={label}
         placeholder={placeholder}
         caption={<Caption helperText={helperText} />}
+        value={
+          selectedIndex ? options[(selectedIndex as IndexPath).row].title : ''
+        }
         onSelect={index => {
           setSelectedIndex(index);
-          if (options?.length > 0) {
-            const i = parseInt(index.toString(), 10);
-            setValue(options[i].value);
+          if (options?.length > 0 && index instanceof IndexPath) {
+            setValue(options[index.row].value);
           }
         }}>
         <>
@@ -56,9 +58,6 @@ const Selection = ({
             <SelectItem key={option.value} title={option.title} />
           ))}
         </>
-        <SelectItem title="Option 1" />
-        <SelectItem title="Option 2" />
-        <SelectItem title="Option 3" />
       </Select>
     </Layout>
   );

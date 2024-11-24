@@ -1,7 +1,8 @@
 import React from 'react';
-import {Button, ButtonProps, Spinner} from '@ui-kitten/components';
+import {Button, ButtonProps} from '@ui-kitten/components';
 import {StyleSheet, StyleProp, ViewStyle, DimensionValue} from 'react-native';
 import {retrieveColorString} from '../../../utils/enums/styleEnums';
+import Text from '../../Typography/Text';
 
 // Define props interface
 interface BaseButtonProps extends ButtonProps {
@@ -56,6 +57,7 @@ const BaseButton: React.FC<BaseButtonProps> = ({
     },
     spinner: {
       backgroundColor: 'white',
+      color: 'white',
     },
   });
 
@@ -67,7 +69,13 @@ const BaseButton: React.FC<BaseButtonProps> = ({
       accessoryLeft={accessoryLeft}
       accessoryRight={accessoryRight}
       {...props}>
-      {!loading ? <>{children}</> : <Spinner style={defaultStyle.spinner} />}
+      {!loading ? (
+        <>{children}</>
+      ) : (
+        <Text color="white" fontWeight="bold">
+          Carregando...
+        </Text>
+      )}
     </Button>
   );
 };

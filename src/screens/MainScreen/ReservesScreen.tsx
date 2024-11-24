@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {View, FlatList, StyleSheet, ListRenderItem} from 'react-native';
 import Text from '../../shared/components/Typography/Text';
-import {generateUserReservesList} from '../../shared/utils/mocks/hotel';
 import Layout from '../../shared/components/Layouts/Layout';
 import Card from '../../shared/components/Cards/Card';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
@@ -14,9 +13,13 @@ import {
 } from '../../shared/utils/enums/styleEnums';
 import ImageSlider from '../../shared/components/Media/ImageSlider/ImageSlider';
 import {UsuarioAgendamento} from '../../shared/interfaces/usuario';
+import {getDataByIdApi} from '../../shared/utils/api/functions';
+import {UserContext} from '../../shared/context/UserProvider';
+import {USUARIO_AGENDAMENTOS_ROUTE} from '../../shared/apiroutes';
+import {Spinner} from '@ui-kitten/components';
 
 type RootStackParamList = {
-  Checkin: undefined;
+  Checkin: {id: number};
 };
 
 interface ReservesScreenProps {
@@ -27,48 +30,60 @@ const ReservesScreen: React.FC<ReservesScreenProps> = () => {
   const [listAgendamentos, setListAgendamentos] = useState<
     UsuarioAgendamento[]
   >([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const userContext = useContext(UserContext);
+
+  const handleSearchAgendamentos = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await getDataByIdApi<UsuarioAgendamento[]>(
+        USUARIO_AGENDAMENTOS_ROUTE,
+        userContext?.user?.id ?? 0,
+      );
+      if (result.status >= 200 && result.status < 300) {
+        setListAgendamentos(result.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [userContext?.user?.id]);
 
   useEffect(() => {
     handleSearchAgendamentos();
-  }, []);
-
-  const handleSearchAgendamentos = () => {
-    setListAgendamentos(generateUserReservesList(10));
-  };
-
-  const fotos: string[] = [
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/40/e5/50/20190118-193234-largejpg.jpg',
-    'https://www.civitatis.com/blog/wp-content/uploads/2022/11/downtown-orlando-florida.jpg',
-  ];
+  }, [handleSearchAgendamentos]);
 
   const renderItem: ListRenderItem<UsuarioAgendamento> = ({item}) => {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
-          navigation.navigate('Checkin');
+          navigation.navigate('Checkin', {id: item.id});
         }}>
         <Card>
           <View style={styles.imageView}>
-            <ImageSlider
-              images={fotos}
-              imageHeight={250}
-              dotSize={10}
-              dotColor={retrieveColorString(
-                styleTypeEnums.PRIMARY,
-                weightEnums[700],
-              )}
-              activeDotColor={retrieveColorString(
-                styleTypeEnums.PRIMARY,
-                weightEnums[700],
-              )}
-              showNavigationButtons={false}
-              showIndicatorDots={true}
-              imageLabel={false}
-              extrapolate="clamp"
-              autoSlideInterval={10000}
-              radius={5}
-            />
+            {item.hotelImagens && item.hotelImagens?.length > 0 && (
+              <ImageSlider
+                images={item.hotelImagens}
+                imageHeight={250}
+                dotSize={10}
+                dotColor={retrieveColorString(
+                  styleTypeEnums.PRIMARY,
+                  weightEnums[700],
+                )}
+                activeDotColor={retrieveColorString(
+                  styleTypeEnums.PRIMARY,
+                  weightEnums[700],
+                )}
+                showNavigationButtons={false}
+                showIndicatorDots={true}
+                imageLabel={false}
+                extrapolate="clamp"
+                autoSlideInterval={10000}
+                radius={5}
+              />
+            )}
           </View>
           <View style={styles.hotelInfo}>
             <Text fontWeight="bold" fontSize={16}>
@@ -94,13 +109,19 @@ const ReservesScreen: React.FC<ReservesScreenProps> = () => {
           Reservas
         </Text>
         <View style={styles.listView}>
-          <FlatList
-            data={listAgendamentos}
-            keyExtractor={item => item.id.toString()}
-            renderItem={renderItem}
-            contentContainerStyle={styles.listContainer}
-            showsVerticalScrollIndicator={false}
-          />
+          {!loading ? (
+            <FlatList
+              data={listAgendamentos}
+              keyExtractor={item => item.id.toString()}
+              renderItem={renderItem}
+              contentContainerStyle={styles.listContainer}
+              showsVerticalScrollIndicator={false}
+            />
+          ) : (
+            <Layout bg="white">
+              <Spinner />
+            </Layout>
+          )}
         </View>
       </Layout>
     </Layout>
