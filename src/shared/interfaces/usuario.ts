@@ -2,7 +2,8 @@ export interface UsuarioAgendamento {
   id: number;
   checkIn: string;
   checkOut: string;
-  confirmado: boolean;
+  checkInConfirmado: boolean;
+  checkOutConfirmado: boolean;
   hotelId: number;
   hotelNome: string;
   hotelEndereco: string;

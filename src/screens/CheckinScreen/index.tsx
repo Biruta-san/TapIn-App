@@ -28,6 +28,80 @@ type NFCReservarScreenProps = {
   };
 };
 
+interface AccordionContentProps {
+  dadosHotel?: UsuarioAgendamento;
+  hasNfc: boolean | null;
+  isSearching: boolean;
+  stopReadNdef: () => void;
+  readNdef: () => void;
+}
+
+const AccordionContent = ({
+  dadosHotel,
+  hasNfc,
+  isSearching,
+  stopReadNdef,
+  readNdef,
+}: AccordionContentProps) => {
+  if (!hasNfc) {
+    return (
+      <Text style={styles.message}>NFC não é suportado pelo dispositivo</Text>
+    );
+  } else if (!dadosHotel?.checkInConfirmado) {
+    return (
+      <>
+        <Text style={styles.message}>Realizar check-in</Text>
+        {isSearching ? (
+          <>
+            <View style={styles.loadingContainer}>
+              <Spinner size="giant" />
+            </View>
+            <View style={styles.loadingContainer}>
+              <BaseButton onPress={stopReadNdef}>
+                <Text fontWeight="bold" color={'white'}>
+                  Parar pesquisa
+                </Text>
+              </BaseButton>
+            </View>
+          </>
+        ) : (
+          <BaseButton w={'100%'} onPress={readNdef}>
+            <Text fontWeight="bold" color={'white'}>
+              Pesquisar tags
+            </Text>
+          </BaseButton>
+        )}
+      </>
+    );
+  } else if (dadosHotel?.checkInConfirmado && !dadosHotel?.checkOutConfirmado) {
+    return (
+      <>
+        <Text style={styles.message}>Realizar check-out</Text>
+        {isSearching ? (
+          <>
+            <View style={styles.loadingContainer}>
+              <Spinner size="giant" />
+            </View>
+            <BaseButton w={'100%'} onPress={stopReadNdef}>
+              <Text fontWeight="bold" color={'white'}>
+                Parar pesquisa
+              </Text>
+            </BaseButton>
+          </>
+        ) : (
+          <BaseButton w={'100%'} onPress={readNdef}>
+            <Text fontWeight="bold" color={'white'}>
+              Pesquisar tags
+            </Text>
+          </BaseButton>
+        )}
+      </>
+    );
+  } else {
+    return <Text style={styles.message}>Agendamento concluído</Text>;
+  }
+};
+
 const NFCReservarScreen: React.FC<NFCReservarScreenProps> = ({route}) => {
   const id = route?.params?.id;
 
@@ -109,7 +183,9 @@ const NFCReservarScreen: React.FC<NFCReservarScreenProps> = ({route}) => {
   const doCheckin = async () => {
     try {
       await putDataApi(HOTEL_CONFIRMAR_AGENDAMENTO_ROUTE, id, {
-        confirmado: true,
+        checkInConfirmado: !dadosHotel?.checkInConfirmado,
+        checkOutConfirmado:
+          dadosHotel?.checkInConfirmado && !dadosHotel?.checkOutConfirmado,
         tagId: tagInfo.id,
       });
       const result = await getDataByIdApi<UsuarioAgendamento>(
@@ -125,42 +201,19 @@ const NFCReservarScreen: React.FC<NFCReservarScreenProps> = ({route}) => {
   // Accordion sections
   const SECTIONS = [
     {
-      title: 'Realizar check-in',
+      title: !dadosHotel?.checkInConfirmado
+        ? 'Realizar check-in'
+        : dadosHotel?.checkInConfirmado && !dadosHotel?.checkOutConfirmado
+        ? 'Realizar check-out'
+        : 'Agendamento concluído',
       content: (
-        <>
-          {dadosHotel?.confirmado ? (
-            <Text style={styles.message}>
-              O Agendamento foi confirmado com sucesso!
-            </Text>
-          ) : hasNfc === null ? (
-            <Text style={styles.message}>
-              Verificando compatibilidade com NFC...
-            </Text>
-          ) : hasNfc ? (
-            isSearching ? (
-              <>
-                <View style={styles.loadingContainer}>
-                  <Spinner size="giant" />
-                </View>
-                <BaseButton onPress={stopReadNdef}>
-                  <Text fontWeight="bold" color={'white'}>
-                    Parar pesquisa
-                  </Text>
-                </BaseButton>
-              </>
-            ) : (
-              <BaseButton w={'100%'} onPress={readNdef}>
-                <Text fontWeight="bold" color={'white'}>
-                  Pesquisar tags
-                </Text>
-              </BaseButton>
-            )
-          ) : (
-            <Text style={styles.message}>
-              NFC não é suportado pelo dispositivo
-            </Text>
-          )}
-        </>
+        <AccordionContent
+          dadosHotel={dadosHotel}
+          hasNfc={hasNfc}
+          isSearching={isSearching}
+          readNdef={readNdef}
+          stopReadNdef={stopReadNdef}
+        />
       ),
     },
   ];
@@ -254,6 +307,6 @@ const styles = StyleSheet.create({
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    marginTop: 10,
   },
 });

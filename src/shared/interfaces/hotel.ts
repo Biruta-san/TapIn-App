@@ -30,6 +30,7 @@ export interface HotelQuartoAgendamento {
   hotelQuartoId: number;
   usuarioId: number;
   usuarioNome: string;
-  confirmado: boolean;
+  checkInConfirmado: boolean;
+  checkOutConfirmado: boolean;
   tagId: string | null;
 }
