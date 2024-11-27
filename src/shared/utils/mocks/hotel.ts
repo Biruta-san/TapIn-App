@@ -33,7 +33,8 @@ export const generateUsuarioAgendamentoMock = (): UsuarioAgendamento => ({
   hotelQuartoNumero: faker.number.int({min: 1, max: 500}), // Example room number
   usuarioId: faker.number.int(),
   usuarioNome: faker.person.fullName(),
-  confirmado: faker.datatype.boolean(),
+  checkInConfirmado: faker.datatype.boolean(),
+  checkOutConfirmado: faker.datatype.boolean(),
   hotelImagens: Array.from({length: faker.number.int({min: 1, max: 5})}, () =>
     faker.image.url({width: 1024, height: 768}),
   ),
